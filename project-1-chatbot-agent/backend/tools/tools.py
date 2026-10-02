@@ -5,7 +5,9 @@ Consolidates all Python function tools, Gemini FunctionDeclaration schemas,
 and TOOL_REGISTRY mapping into a single clean module.
 """
 
+import ast
 import json
+import operator
 from datetime import datetime
 from pathlib import Path
 from google.genai import types
@@ -24,10 +26,31 @@ def get_current_datetime() -> dict:
     }
 
 
+_OPERATORS = {
+    ast.Add: operator.add, ast.Sub: operator.sub, ast.Mult: operator.mul,
+    ast.Div: operator.truediv, ast.FloorDiv: operator.floordiv,
+    ast.Mod: operator.mod, ast.Pow: operator.pow,
+    ast.USub: operator.neg, ast.UAdd: operator.pos,
+}
+
+
+def _evaluate(node):
+    """Evaluates a parsed expression, allowing only numbers and arithmetic operators."""
+    if isinstance(node, ast.Expression):
+        return _evaluate(node.body)
+    if isinstance(node, ast.Constant) and isinstance(node.value, (int, float)):
+        return node.value
+    if isinstance(node, ast.BinOp) and type(node.op) in _OPERATORS:
+        return _OPERATORS[type(node.op)](_evaluate(node.left), _evaluate(node.right))
+    if isinstance(node, ast.UnaryOp) and type(node.op) in _OPERATORS:
+        return _OPERATORS[type(node.op)](_evaluate(node.operand))
+    raise ValueError("Only numbers and + - * / // % ** ( ) are allowed.")
+
+
 def calculate(expression: str) -> dict:
-    """Safely evaluates a mathematical expression."""
+    """Safely evaluates a mathematical expression (no eval, arithmetic only)."""
     try:
-        return {"result": eval(expression, {"__builtins__": {}})}
+        return {"result": _evaluate(ast.parse(expression.strip(), mode="eval"))}
     except Exception as exc:
         return {"error": str(exc)}
 
