@@ -20,6 +20,30 @@ const topKValue        = document.getElementById("topKValue");
 const typingIndicator  = document.getElementById("typingIndicator");
 const toast            = document.getElementById("toast");
 
+function escapeHtml(str) {
+  return String(str ?? "").replace(/[&<>"']/g, c => (
+    { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]
+  ));
+}
+
+// Escape first, then allow only **bold** so model output can't inject markup.
+function renderText(text) {
+  return escapeHtml(text).replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>");
+}
+
+const statusDot = document.getElementById("statusDot");
+function setStatus(state, label) {
+  healthCount.textContent = label;
+  statusDot.className = `status-dot ${state}`;
+}
+
+// ── Sidebar toggle (collapsed by default on small screens) ───────────────────
+const sidebar = document.getElementById("sidebar");
+if (window.matchMedia("(max-width: 720px)").matches) sidebar.classList.add("collapsed");
+document.getElementById("sidebarToggleBtn").addEventListener("click", () => {
+  sidebar.classList.toggle("collapsed");
+});
+
 // ── Slider Listener ───────────────────────────────────────────────────────────
 if (topKSlider && topKValue) {
   topKSlider.addEventListener("input", (e) => {
@@ -42,7 +66,7 @@ async function fetchHealthAndSources() {
     const healthRes = await fetch(`${API_BASE}/api/health`);
     if (healthRes.ok) {
       const hData = await healthRes.json();
-      healthCount.textContent = `Online (${hData.chunk_count || 0} chunks indexed)`;
+      setStatus("online", `${hData.chunk_count || 0} passages indexed`);
     }
 
     // 2. Fetch Sources
@@ -52,7 +76,7 @@ async function fetchHealthAndSources() {
       renderSidebarSources(sData.documents);
     }
   } catch (err) {
-    healthCount.textContent = "Offline / Backend error";
+    setStatus("offline", "Backend unreachable");
     console.error("Health check error:", err);
   }
 }
@@ -62,7 +86,7 @@ function renderSidebarSources(docs) {
   sourcesListSide.innerHTML = "";
 
   if (!docs || docs.length === 0) {
-    sourcesListSide.innerHTML = '<div class="source-loading">No documents indexed yet.</div>';
+    sourcesListSide.innerHTML = '<div class="source-loading">No documents indexed.</div>';
     return;
   }
 
@@ -70,8 +94,8 @@ function renderSidebarSources(docs) {
     const item = document.createElement("div");
     item.className = "source-item";
     item.innerHTML = `
-      <span><span class="doc-icon">📄</span>${doc.filename}</span>
-      <span class="doc-badge">${doc.chunk_count} chunks</span>
+      <span class="doc-name" title="${escapeHtml(doc.filename)}">${escapeHtml(doc.filename)}</span>
+      <span class="doc-badge">${doc.chunk_count}</span>
     `;
     sourcesListSide.appendChild(item);
   });
@@ -82,18 +106,15 @@ function clearWelcome() {
   if (welcomeCard) welcomeCard.style.display = "none";
 }
 
-function appendMessage(role, text, declined = false, sources = []) {
+function appendMessage(role, text, declined = false, sources = [], isError = false) {
   clearWelcome();
   const msg = document.createElement("div");
-  msg.className = `msg ${role}${declined ? " declined" : ""}`;
-
-  const avatar = document.createElement("div");
-  avatar.className = "avatar";
-  avatar.textContent = role === "user" ? "🧑" : "🤖";
+  msg.className = `msg ${role}${declined ? " declined" : ""}${isError ? " error" : ""}`;
 
   const bubble = document.createElement("div");
   bubble.className = "bubble";
-  bubble.textContent = text;
+  if (role === "bot") bubble.innerHTML = renderText(text);
+  else bubble.textContent = text;
 
   if (sources && sources.length > 0 && !declined) {
     const citationContainer = document.createElement("div");
@@ -102,13 +123,12 @@ function appendMessage(role, text, declined = false, sources = []) {
       const badge = document.createElement("span");
       badge.className = "citation-badge";
       const matchPct = Math.round((1 - s.score) * 100);
-      badge.innerHTML = `📄 <strong>${s.source}</strong> (Chunk #${s.chunk_index} · ${matchPct}% match)`;
+      badge.innerHTML = `<strong>${escapeHtml(s.source)}</strong> · #${escapeHtml(s.chunk_index)} · ${matchPct}%`;
       citationContainer.appendChild(badge);
     });
     bubble.appendChild(citationContainer);
   }
 
-  msg.appendChild(avatar);
   msg.appendChild(bubble);
   chatWindow.appendChild(msg);
   chatWindow.scrollTop = chatWindow.scrollHeight;
@@ -129,9 +149,9 @@ function renderSources(sources) {
     li.className = "source-card";
     const scorePct = Math.round((1 - s.score) * 100);
     li.innerHTML = `
-      <div class="source-name">${s.source}</div>
-      <div class="source-score">Chunk #${s.chunk_index} · match: ${scorePct}% (distance ${s.score})</div>
-      <div class="source-excerpt">${s.text}</div>`;
+      <div class="source-name">${escapeHtml(s.source)}</div>
+      <div class="source-score">Chunk #${escapeHtml(s.chunk_index)} · ${scorePct}% match</div>
+      <div class="source-excerpt">${escapeHtml(s.text)}</div>`;
     sourcesList.appendChild(li);
   });
 
@@ -148,6 +168,7 @@ async function submitQuestion(questionText) {
   appendMessage("user", question);
   queryInput.value = "";
   btnSend.disabled = true;
+  newChatBtn.disabled = true;
 
   if (typingIndicator) typingIndicator.classList.remove("hidden");
 
@@ -162,7 +183,7 @@ async function submitQuestion(questionText) {
     if (typingIndicator) typingIndicator.classList.add("hidden");
 
     if (!res.ok) {
-      appendMessage("bot", `⚠ Error: ${data.detail || "Something went wrong."}`);
+      appendMessage("bot", data.detail || "Something went wrong.", false, [], true);
       renderSources([]);
       return;
     }
@@ -172,13 +193,46 @@ async function submitQuestion(questionText) {
 
   } catch (err) {
     if (typingIndicator) typingIndicator.classList.add("hidden");
-    appendMessage("bot", "⚠ Could not reach backend server.");
+    appendMessage("bot", "Could not reach the backend server.", false, [], true);
     console.error(err);
   } finally {
     btnSend.disabled = false;
+    newChatBtn.disabled = false;
     queryInput.focus();
   }
 }
+
+// ── New chat (with confirmation) ─────────────────────────────────────────────
+function startNewChat() {
+  Array.from(chatWindow.children).forEach((el) => {
+    if (el.id !== "welcomeCard") el.remove();
+  });
+  welcomeCard.style.display = "";
+  renderSources([]);
+  queryInput.value = "";
+  queryInput.focus();
+}
+
+// ── New chat (with confirmation) ─────────────────────────────────────────────
+const newChatBtn   = document.getElementById("newChatBtn");
+const confirmModal = document.getElementById("confirmModal");
+const confirmOk    = document.getElementById("confirmOk");
+const confirmCancel = document.getElementById("confirmCancel");
+
+function openConfirm()  { confirmModal.hidden = false; confirmOk.focus(); }
+function closeConfirm() { confirmModal.hidden = true; newChatBtn.focus(); }
+
+newChatBtn.addEventListener("click", () => {
+  // Nothing to lose if no messages have been sent yet
+  if (document.querySelector(".msg")) openConfirm();
+});
+confirmCancel.addEventListener("click", closeConfirm);
+confirmModal.addEventListener("click", e => { if (e.target === confirmModal) closeConfirm(); });
+document.addEventListener("keydown", e => { if (e.key === "Escape" && !confirmModal.hidden) closeConfirm(); });
+confirmOk.addEventListener("click", async () => {
+  closeConfirm();
+  await startNewChat();
+});
 
 // ── Form Submit Event ─────────────────────────────────────────────────────────
 queryForm.addEventListener("submit", (e) => {
@@ -213,7 +267,7 @@ if (btnUploadTrigger && docUploadInput) {
     }
 
     btnUploadTrigger.disabled = true;
-    btnUploadTrigger.textContent = "⏳ Uploading & Indexing…";
+    btnUploadTrigger.textContent = "Uploading…";
 
     const formData = new FormData();
     formData.append("file", file);
@@ -228,15 +282,15 @@ if (btnUploadTrigger && docUploadInput) {
       if (!res.ok) {
         showToast(`Upload failed: ${data.detail}`, "error");
       } else {
-        showToast(`✓ ${data.filename} uploaded & indexed! (${data.chunks_stored} total chunks)`, "success");
+        showToast(`${data.filename} indexed (${data.chunks_stored} passages total)`, "success");
         fetchHealthAndSources();
       }
     } catch (err) {
-      showToast("⚠ Upload error.", "error");
+      showToast("Upload failed.", "error");
       console.error(err);
     } finally {
       btnUploadTrigger.disabled = false;
-      btnUploadTrigger.textContent = "📤 Upload PDF Document";
+      btnUploadTrigger.textContent = "Upload PDF";
       docUploadInput.value = "";
     }
   });
@@ -245,7 +299,7 @@ if (btnUploadTrigger && docUploadInput) {
 // ── Ingest / Rebuild Trigger ──────────────────────────────────────────────────
 btnIngest.addEventListener("click", async () => {
   btnIngest.disabled = true;
-  btnIngest.textContent = "⏳ Rebuilding Index…";
+  btnIngest.textContent = "Rebuilding…";
 
   try {
     const res = await fetch(`${API_BASE}/ingest`, { method: "POST" });
@@ -254,23 +308,17 @@ btnIngest.addEventListener("click", async () => {
     if (!res.ok) {
       showToast(`Ingestion failed: ${data.detail}`, "error");
     } else {
-      showToast(`✓ ${data.documents_ingested} docs · ${data.chunks_stored} chunks indexed`, "success");
+      showToast(`${data.documents_ingested} documents, ${data.chunks_stored} passages indexed`, "success");
       fetchHealthAndSources();
     }
   } catch (err) {
-    showToast("⚠ Backend unreachable.", "error");
+    showToast("Backend unreachable.", "error");
     console.error(err);
   } finally {
     btnIngest.disabled = false;
-    btnIngest.textContent = "⚙ Rebuild Vector Index";
+    btnIngest.textContent = "Rebuild index";
   }
 });
 
 // ── Initial Load ─────────────────────────────────────────────────────────────
 fetchHealthAndSources();
-
-// Send initial default greeting message from agent
-appendMessage(
-  "bot",
-  "Hello! 👋 I am the Bharati Vidyapeeth Policy Assistant. Ask me any question about admissions, fee refunds, hostel curfews, library borrowing rules, or examination guidelines!"
-);

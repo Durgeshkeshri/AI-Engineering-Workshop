@@ -3,144 +3,129 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="Bharati Vidyapeeth RAG — Ask questions about college policies and get grounded answers with source citations." />
-  <title>Bharati Vidyapeeth Policy RAG Assistant</title>
-  <!-- Google Fonts: Inter & JetBrains Mono -->
+  <meta name="description" content="Ask questions about Bharati Vidyapeeth policies and get answers grounded in the source documents." />
+  <title>Bharati Vidyapeeth Policy Assistant</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css?v=4" />
 </head>
 <body>
 
   <div class="app-container">
 
-    <!-- Sidebar -->
-    <aside class="sidebar">
+    <aside class="sidebar" id="sidebar">
       <div class="brand">
-        <div class="brand-icon">🎓</div>
+        <div class="brand-mark">BV</div>
         <div class="brand-text">
-          <h2>Bharati Vidyapeeth RAG</h2>
+          <h2>Bharati Vidyapeeth</h2>
           <span>Policy Assistant</span>
         </div>
       </div>
 
       <div class="sidebar-section">
-        <label class="section-label">Active Policy Documents</label>
+        <span class="section-label">Documents</span>
         <div id="sourcesList" class="sources-list">
-          <div class="source-loading">Scanning document index…</div>
+          <div class="source-loading">Loading…</div>
         </div>
+        <input type="file" id="docUploadInput" accept=".pdf" hidden />
+        <button id="btnUploadTrigger" class="btn btn-secondary">Upload PDF</button>
       </div>
 
       <div class="sidebar-section">
         <div class="slider-row">
-          <span class="control-title">Retrieve Chunks (Top K)</span>
+          <label class="control-title" for="topKSlider">Passages retrieved</label>
           <span id="topKValue" class="control-value">3</span>
         </div>
         <input type="range" id="topKSlider" min="2" max="6" value="3" class="slider-input" />
       </div>
 
       <div class="sidebar-section">
-        <label class="section-label">Sample Grounded Queries</label>
+        <span class="section-label">Suggested questions</span>
         <div class="suggestions-list">
-          <button class="suggestion-chip" data-msg="What is the minimum attendance required for examinations?">Attendance Limit</button>
-          <button class="suggestion-chip" data-msg="What are the curfew timings for the hostel?">Hostel Curfew</button>
-          <button class="suggestion-chip" data-msg="What is the fee refund policy on admission cancellation?">Fee Refund Policy</button>
-          <button class="suggestion-chip" data-msg="What are the library borrowing rules for students?">Library Rules</button>
-          <button class="suggestion-chip" data-msg="What is the campus WiFi password?">WiFi Password (Out-of-Scope)</button>
+          <button class="suggestion-chip" data-msg="What is the minimum attendance required for examinations?">Attendance requirement</button>
+          <button class="suggestion-chip" data-msg="What are the curfew timings for the hostel?">Hostel curfew</button>
+          <button class="suggestion-chip" data-msg="What is the fee refund policy on admission cancellation?">Fee refund policy</button>
+          <button class="suggestion-chip" data-msg="What are the library borrowing rules for students?">Library borrowing rules</button>
+          <button class="suggestion-chip" data-msg="What is the campus WiFi password?">Out-of-scope example</button>
         </div>
-      </div>
-
-      <div class="sidebar-section">
-        <label class="section-label">Upload Policy Document</label>
-        <input type="file" id="docUploadInput" accept=".pdf" style="display: none;" />
-        <button id="btnUploadTrigger" class="btn btn-secondary">
-          <span>📤 Upload PDF Document</span>
-        </button>
       </div>
 
       <div class="sidebar-footer">
-        <button id="btn-ingest" class="btn btn-secondary">
-          <span>⚙ Rebuild Vector Index</span>
-        </button>
+        <button id="btn-ingest" class="btn btn-secondary">Rebuild index</button>
       </div>
     </aside>
 
-    <!-- Main Viewport -->
     <main class="chat-viewport">
       <header class="chat-header">
+        <button class="icon-btn" id="sidebarToggleBtn" aria-label="Toggle sidebar" title="Toggle sidebar">
+          <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true">
+            <rect x="2.5" y="3.5" width="13" height="11" rx="2" stroke="currentColor" stroke-width="1.4"/>
+            <path d="M7 3.5v11" stroke="currentColor" stroke-width="1.4"/>
+          </svg>
+        </button>
+        <h1 class="chat-title">Policy questions</h1>
         <div class="status-badge">
-          <span class="status-dot"></span>
-          <span id="healthCount">Syncing vector store…</span>
+          <span class="status-dot" id="statusDot"></span>
+          <span id="healthCount">Connecting…</span>
         </div>
-        <div class="header-actions">
-          <span class="badge">Retrieval-Augmented Generation</span>
-        </div>
+        <button class="btn btn-ghost" id="newChatBtn" title="Start a new chat">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+            <path d="M7 2.5v9M2.5 7h9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+          New chat
+        </button>
       </header>
 
       <div class="chat-body">
-        <!-- Message Stream -->
         <section class="messages-container" id="chat-window" aria-live="polite" aria-label="Conversation">
-          <!-- Welcome Card -->
           <div class="welcome-card" id="welcomeCard">
-            <div class="welcome-icon">💬</div>
-            <p>Ask questions about admissions, fee refunds, examination rules, library borrowing, or hostel curfews.</p>
-            <div class="capabilities-grid">
-              <div class="cap-card">
-                <h3>Local Vector Store</h3>
-                <p>Stores document embeddings in persistent ChromaDB.</p>
-              </div>
-              <div class="cap-card">
-                <h3>Strict Grounding</h3>
-                <p>Answers are generated based ONLY on retrieved facts.</p>
-              </div>
-              <div class="cap-card">
-                <h3>Source Citations</h3>
-                <p>Highlights exact files and chunk indices used.</p>
-              </div>
-            </div>
+            <h2>Ask about college policy</h2>
+            <p>Answers come only from the indexed documents, with the passages used shown alongside each response.</p>
           </div>
         </section>
 
-        <!-- Right Drawer / Sources panel -->
         <aside class="sources-panel" id="sources-panel" hidden>
-          <h2>📎 Retrieved Chunks</h2>
+          <h2>Retrieved passages</h2>
           <ul id="sources-list"></ul>
         </aside>
       </div>
 
-      <!-- Typing Indicator -->
       <div class="typing-indicator hidden" id="typingIndicator">
-        <div class="dots">
-          <span></span><span></span><span></span>
-        </div>
-        <span class="typing-text">Embedding query & retrieving policies…</span>
+        <div class="dots"><span></span><span></span><span></span></div>
+        <span>Searching documents…</span>
       </div>
 
-      <!-- Input Area -->
       <footer class="chat-input-area">
         <form id="query-form" autocomplete="off">
           <input
             id="query-input"
             type="text"
-            placeholder="Ask about admissions, fee refund, hostel curfew, exam rules…"
+            placeholder="Ask a question…"
             aria-label="Your question"
             required
           />
-          <button type="submit" id="btn-send" class="btn btn-primary" aria-label="Send question">
-            <span>Query</span>
-            <span class="send-icon">➤</span>
-          </button>
+          <button type="submit" id="btn-send" class="btn btn-primary" aria-label="Send question">Ask</button>
         </form>
       </footer>
 
     </main>
 
-    <!-- Toast notifications -->
     <div id="toast" class="toast" role="alert" aria-live="assertive" hidden></div>
 
   </div>
 
-  <script src="app.js"></script>
+  <div class="modal-backdrop" id="confirmModal" hidden>
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="confirmTitle">
+      <h2 id="confirmTitle">Start a new chat?</h2>
+      <p>Your current conversation will be cleared and can't be recovered.</p>
+      <div class="modal-actions">
+        <button type="button" class="btn btn-ghost" id="confirmCancel">Cancel</button>
+        <button type="button" class="btn btn-primary" id="confirmOk">Start new chat</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js?v=4"></script>
 </body>
 </html>
