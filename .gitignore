@@ -3,3 +3,7 @@ venv/
 **/__pycache__/
 *.pyc
 .DS_Store
+
+# Generated vector index (rebuild with POST /ingest)
+project-2-rag-pipeline/backend/data/chroma_db/*
+!project-2-rag-pipeline/backend/data/chroma_db/.gitkeep
