@@ -22,8 +22,8 @@ async def query(body: QueryRequest):
     Steps:
       1. Embed the question  (embedder.embed_query)
       2. Retrieve top-k similar chunks  (retriever.retrieve)
-      3. Build grounded prompt + generate answer  (grounded_prompt.generate_answer)
-      4. Return answer + source citations
+      3. Generate the reply; the model classifies small talk / policy / out-of-scope
+      4. Return the reply, with source citations only when policy chunks were used
     """
     if collection_count() == 0:
         raise HTTPException(
@@ -36,7 +36,7 @@ async def query(body: QueryRequest):
         chunks = retrieve(body.question, top_k=body.top_k)
 
         # Generate
-        answer, declined = generate_answer(body.question, chunks)
+        answer, declined, used_chunks = generate_answer(body.question, chunks)
 
         # Format source citations
         sources = [
@@ -46,7 +46,7 @@ async def query(body: QueryRequest):
                 score=round(c["score"], 4),
                 text=c["text"],
             )
-            for c in chunks
+            for c in used_chunks
         ]
 
         return QueryResponse(answer=answer, sources=sources, declined=declined)

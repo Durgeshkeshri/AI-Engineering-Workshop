@@ -20,6 +20,9 @@ class Settings(BaseSettings):
     # Number of chunks to retrieve per query
     top_k: int = 3
 
+    # Max ChromaDB distance for a chunk to count as relevant (lower = more similar)
+    relevance_threshold: float = 0.5
+
     model_config = {
         "env_file": find_dotenv(),
         "env_file_encoding": "utf-8",

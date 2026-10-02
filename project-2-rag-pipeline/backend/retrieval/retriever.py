@@ -3,6 +3,9 @@ retriever.py — Semantic similarity search & grounded answer generation.
 """
 
 from pathlib import Path
+from typing import Literal
+
+from pydantic import BaseModel
 from google import genai
 from google.genai import types
 
@@ -12,7 +15,6 @@ from retrieval.vector_store import query_collection
 
 client = genai.Client(api_key=settings.gemini_api_key)
 
-RELEVANCE_THRESHOLD = 0.5
 PROMPTS_DIR = Path(__file__).parent.parent / "prompts"
 SYSTEM_PROMPT = (PROMPTS_DIR / "system_prompt.txt").read_text(encoding="utf-8").strip()
 
@@ -39,28 +41,50 @@ def retrieve(question: str, top_k: int | None = None) -> list[dict]:
     return chunks
 
 
-def generate_answer(question: str, chunks: list[dict]) -> tuple[str, bool]:
+class AssistantReply(BaseModel):
+    reasoning: str
+    intent: Literal["small_talk", "policy_question", "partial_answer", "out_of_scope"]
+    answer: str
+
+
+FALLBACK_REPLY = (
+    "Sorry, I couldn't put an answer together just now. Please try asking again."
+)
+
+
+def generate_answer(question: str, chunks: list[dict]) -> tuple[str, bool, list[dict]]:
     """
-    Generate a grounded answer using retrieved context chunks.
-    Returns (answer_text, declined_boolean).
+    Generate a reply from the retrieved chunks. The model decides whether the
+    message is small talk, a policy question, a partial answer, or out of scope.
+    Returns (answer_text, declined, chunks_actually_used).
     """
-    relevant_chunks = [c for c in chunks if c["score"] <= RELEVANCE_THRESHOLD]
-    if not relevant_chunks:
-        decline_msg = (
-            "I'm sorry, I don't have enough information in my knowledge base "
-            "to answer that question. Please contact the college directly."
-        )
-        return decline_msg, True
+    relevant_chunks = [c for c in chunks if c["score"] <= settings.relevance_threshold]
 
     context_lines = ["<context>"]
-    for i, c in enumerate(relevant_chunks, 1):
-        context_lines.append(f'<chunk id="{i}" source="{c["source"]}" chunk_index="{c["chunk_index"]}">{c["text"]}</chunk>')
+    for c in relevant_chunks:
+        context_lines.append(
+            f'<chunk source="{c["source"]}" chunk_index="{c["chunk_index"]}">{c["text"]}</chunk>'
+        )
+    if not relevant_chunks:
+        context_lines.append("(no relevant passages were found)")
     context_lines.append("</context>")
 
-    user_message = f"{'\n'.join(context_lines)}\n\n<question>{question}</question>"
+    user_message = "\n".join(context_lines) + f"\n\n<question>{question}</question>"
     response = client.models.generate_content(
         model=settings.gemini_model,
         contents=[types.Part(text=user_message)],
-        config=types.GenerateContentConfig(system_instruction=SYSTEM_PROMPT),
+        config=types.GenerateContentConfig(
+            system_instruction=SYSTEM_PROMPT,
+            temperature=0.4,
+            response_mime_type="application/json",
+            response_schema=AssistantReply,
+        ),
     )
-    return response.text.strip(), False
+
+    reply = response.parsed
+    if reply is None or not reply.answer.strip():
+        return FALLBACK_REPLY, False, []
+
+    print(f"  intent={reply.intent}  reasoning={reply.reasoning}")
+    used = relevant_chunks if reply.intent in ("policy_question", "partial_answer") else []
+    return reply.answer.strip(), reply.intent == "out_of_scope", used
