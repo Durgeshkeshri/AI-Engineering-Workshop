@@ -2,7 +2,7 @@ import uuid
 from fastapi import APIRouter, HTTPException
 
 from agent.agent_loop import run_agent
-from memory import clear_session, get_history
+from memory import get_history
 from model import ChatRequest, ChatResponse
 
 router = APIRouter()
@@ -29,9 +29,3 @@ def chat(req: ChatRequest):
         tools_used=tools_used,
         citations=citations,
     )
-
-
-@router.delete("/chat/clear")
-def clear(session_id: str):
-    cleared = clear_session(session_id)
-    return {"cleared": cleared, "session_id": session_id}

@@ -14,11 +14,3 @@ def get_history(session_id: str) -> list[types.Content]:
     if session_id not in _sessions:
         _sessions[session_id] = []
     return _sessions[session_id]
-
-
-def clear_session(session_id: str) -> bool:
-    """Clears conversation history for a given session ID."""
-    if session_id in _sessions:
-        del _sessions[session_id]
-        return True
-    return False

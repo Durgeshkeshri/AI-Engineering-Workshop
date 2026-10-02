@@ -175,13 +175,9 @@ async function sendMessage() {
 }
 
 /* ─── New chat ───────────────────────────────────────────────────────────── */
-async function startNewChat() {
-  if (sessionId) {
-    try {
-      await fetch(`${API_BASE}/chat/clear?session_id=${sessionId}`, { method: "DELETE" });
-    } catch (_) {}
-    sessionId = null;
-  }
+function startNewChat() {
+  // Dropping the session ID makes the server start a fresh session on the next message
+  sessionId = null;
   Array.from(chatWindow.children).forEach(el => {
     if (el.id !== "welcomeCard") el.remove();
   });
@@ -228,9 +224,9 @@ newChatBtn.addEventListener("click", () => {
 confirmCancel.addEventListener("click", closeConfirm);
 confirmModal.addEventListener("click", e => { if (e.target === confirmModal) closeConfirm(); });
 document.addEventListener("keydown", e => { if (e.key === "Escape" && !confirmModal.hidden) closeConfirm(); });
-confirmOk.addEventListener("click", async () => {
+confirmOk.addEventListener("click", () => {
   closeConfirm();
-  await startNewChat();
+  startNewChat();
 });
 
 // Sample queries load into textbox (never auto-send)
