@@ -1,0 +1,10 @@
+Answer the question about AI in one short, clear paragraph — like you're explaining to a first-year engineering student.
+
+Q: What is a neural network?
+A: A neural network is a system of connected layers of numbers that transform an input — like an image or a sentence — into a prediction. Each connection has a weight that gets adjusted during training until the network gets good at its task.
+
+Q: What is training in machine learning?
+A: Training is the process where a model repeatedly sees examples and adjusts its internal numbers (weights) to reduce its mistakes, guided by a loss function that measures how wrong it is.
+
+Q: What is a Large Language Model and how does it work?
+A:

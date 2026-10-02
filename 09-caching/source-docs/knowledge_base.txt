@@ -1,0 +1,484 @@
+Introduction to Artificial Intelligence and Machine Learning
+
+Artificial intelligence (AI) is the simulation of human intelligence processes
+by computer systems. These processes include learning, reasoning, and
+self-correction.
+
+Machine Learning (ML) is a subset of AI that allows computers to learn from
+data without being explicitly programmed. Instead of writing rules manually,
+we feed the computer data and let it figure out the rules on its own.
+
+Deep Learning is a further subset of ML that uses neural networks with many
+layers. These deep networks can automatically learn complex representations
+from raw input data like images, text, and audio.
+
+Neural Networks are computing systems vaguely inspired by the biological
+neural networks that constitute animal brains. A neural network consists of
+layers of interconnected nodes or neurons that process information.
+
+Supervised Learning is a type of ML where the model is trained on labeled
+data. The model learns to map input features to known output labels. Examples
+include image classification and spam detection.
+
+Unsupervised Learning is a type of ML where the model is trained on unlabeled
+data and must find structure on its own. Examples include clustering and
+dimensionality reduction.
+
+Reinforcement Learning is a type of ML where an agent learns to make decisions
+by interacting with an environment and receiving rewards or penalties.
+
+Natural Language Processing (NLP) is a branch of AI that helps computers
+understand, interpret, and generate human language. It powers applications
+like chatbots, translation tools, and sentiment analysis.
+
+Computer Vision is a field of AI that enables machines to interpret and make
+decisions based on visual data. Applications include face recognition,
+medical imaging, and autonomous vehicles.
+
+Transformers are a type of deep learning architecture introduced in 2017 that
+revolutionized NLP. The self-attention mechanism allows them to process
+sequences in parallel and capture long-range dependencies.
+
+Large Language Models (LLMs) are neural networks trained on vast amounts of
+text data. They can generate coherent text, answer questions, write code,
+and perform reasoning tasks.
+
+Generative AI refers to AI systems that can create new content, such as text,
+images, audio, and video. Examples include GPT, DALL-E, and Gemini.
+
+Prompt Engineering is the practice of designing effective inputs for AI models
+to get the desired outputs. It is a key skill for working with LLMs.
+
+Transfer Learning is a technique where a model trained on one task is
+fine-tuned for a different but related task. It dramatically reduces training
+time and data requirements.
+
+Embeddings are dense vector representations of data, such as words or
+sentences, in a high-dimensional space. Similar items are close together
+in this space, enabling semantic search and recommendation systems.
+
+Vector Databases are specialized databases designed to store and retrieve
+embeddings efficiently using similarity search algorithms.
+
+Retrieval Augmented Generation (RAG) is an AI technique that combines a
+retrieval system with a generative model. It fetches relevant documents
+from a knowledge base and passes them as context to the LLM, reducing
+hallucinations and grounding responses in real data.
+
+Hallucination is a phenomenon where an AI model generates factually incorrect
+or nonsensical information with confidence. Mitigation strategies include RAG,
+fact-checking, and calibration.
+
+Fine-tuning is the process of further training a pre-trained model on a
+smaller, task-specific dataset. It adapts the model to specialized domains
+like medical diagnosis or legal text analysis.
+
+Model Evaluation is the process of assessing a model performance using
+metrics such as accuracy, precision, recall, F1 score, and perplexity.
+
+Bias in AI refers to systematic errors in model outputs that arise from
+biased training data or flawed model design. It can lead to unfair or
+discriminatory outcomes.
+
+Explainable AI (XAI) is the set of techniques that make AI model decisions
+interpretable and transparent to humans, which is critical for high-stakes
+applications like healthcare and finance.
+
+Edge AI refers to running AI models locally on end-user devices rather than
+in the cloud, enabling real-time inference with lower latency and improved
+privacy.
+
+Multimodal AI refers to AI systems that can process and generate multiple
+types of data, such as text, images, audio, and video, simultaneously.
+
+Agents in AI are autonomous systems that perceive their environment, make
+decisions, and take actions to achieve a goal. They can use tools, browse
+the web, write code, and collaborate with other agents.
+
+Function Calling is a feature that allows LLMs to invoke external tools or
+APIs. The model generates a structured call, the tool executes it, and the
+result is fed back to the model for a final answer.
+
+Context Window is the maximum number of tokens an LLM can process at once,
+including both input and output. Gemini models support context windows up to
+one million tokens.
+
+Tokenization is the process of breaking text into smaller units called tokens
+before feeding it to an LLM. A token is roughly four characters or 0.75 words
+in English.
+
+Context Caching is a feature that allows developers to store a large, repeated
+portion of the input context, such as a system prompt or a long document, on
+the server side. Subsequent requests that reference the cache avoid re-sending
+and re-processing those tokens, reducing latency and cost.
+
+AI Ethics is the study of moral questions related to the development and
+deployment of AI systems, including fairness, accountability, transparency,
+and privacy.
+
+Responsible AI is the practice of designing, developing, and deploying AI
+systems in ways that are safe, fair, transparent, explainable, and aligned
+with human values and societal well-being.
+Introduction to Artificial Intelligence and Machine Learning
+
+Artificial intelligence (AI) is the simulation of human intelligence processes
+by computer systems. These processes include learning, reasoning, and
+self-correction.
+
+Machine Learning (ML) is a subset of AI that allows computers to learn from
+data without being explicitly programmed. Instead of writing rules manually,
+we feed the computer data and let it figure out the rules on its own.
+
+Deep Learning is a further subset of ML that uses neural networks with many
+layers. These deep networks can automatically learn complex representations
+from raw input data like images, text, and audio.
+
+Neural Networks are computing systems vaguely inspired by the biological
+neural networks that constitute animal brains. A neural network consists of
+layers of interconnected nodes or neurons that process information.
+
+Supervised Learning is a type of ML where the model is trained on labeled
+data. The model learns to map input features to known output labels. Examples
+include image classification and spam detection.
+
+Unsupervised Learning is a type of ML where the model is trained on unlabeled
+data and must find structure on its own. Examples include clustering and
+dimensionality reduction.
+
+Reinforcement Learning is a type of ML where an agent learns to make decisions
+by interacting with an environment and receiving rewards or penalties.
+
+Natural Language Processing (NLP) is a branch of AI that helps computers
+understand, interpret, and generate human language. It powers applications
+like chatbots, translation tools, and sentiment analysis.
+
+Computer Vision is a field of AI that enables machines to interpret and make
+decisions based on visual data. Applications include face recognition,
+medical imaging, and autonomous vehicles.
+
+Transformers are a type of deep learning architecture introduced in 2017 that
+revolutionized NLP. The self-attention mechanism allows them to process
+sequences in parallel and capture long-range dependencies.
+
+Large Language Models (LLMs) are neural networks trained on vast amounts of
+text data. They can generate coherent text, answer questions, write code,
+and perform reasoning tasks.
+
+Generative AI refers to AI systems that can create new content, such as text,
+images, audio, and video. Examples include GPT, DALL-E, and Gemini.
+
+Prompt Engineering is the practice of designing effective inputs for AI models
+to get the desired outputs. It is a key skill for working with LLMs.
+
+Transfer Learning is a technique where a model trained on one task is
+fine-tuned for a different but related task. It dramatically reduces training
+time and data requirements.
+
+Embeddings are dense vector representations of data, such as words or
+sentences, in a high-dimensional space. Similar items are close together
+in this space, enabling semantic search and recommendation systems.
+
+Vector Databases are specialized databases designed to store and retrieve
+embeddings efficiently using similarity search algorithms.
+
+Retrieval Augmented Generation (RAG) is an AI technique that combines a
+retrieval system with a generative model. It fetches relevant documents
+from a knowledge base and passes them as context to the LLM, reducing
+hallucinations and grounding responses in real data.
+
+Hallucination is a phenomenon where an AI model generates factually incorrect
+or nonsensical information with confidence. Mitigation strategies include RAG,
+fact-checking, and calibration.
+
+Fine-tuning is the process of further training a pre-trained model on a
+smaller, task-specific dataset. It adapts the model to specialized domains
+like medical diagnosis or legal text analysis.
+
+Model Evaluation is the process of assessing a model performance using
+metrics such as accuracy, precision, recall, F1 score, and perplexity.
+
+Bias in AI refers to systematic errors in model outputs that arise from
+biased training data or flawed model design. It can lead to unfair or
+discriminatory outcomes.
+
+Explainable AI (XAI) is the set of techniques that make AI model decisions
+interpretable and transparent to humans, which is critical for high-stakes
+applications like healthcare and finance.
+
+Edge AI refers to running AI models locally on end-user devices rather than
+in the cloud, enabling real-time inference with lower latency and improved
+privacy.
+
+Multimodal AI refers to AI systems that can process and generate multiple
+types of data, such as text, images, audio, and video, simultaneously.
+
+Agents in AI are autonomous systems that perceive their environment, make
+decisions, and take actions to achieve a goal. They can use tools, browse
+the web, write code, and collaborate with other agents.
+
+Function Calling is a feature that allows LLMs to invoke external tools or
+APIs. The model generates a structured call, the tool executes it, and the
+result is fed back to the model for a final answer.
+
+Context Window is the maximum number of tokens an LLM can process at once,
+including both input and output. Gemini models support context windows up to
+one million tokens.
+
+Tokenization is the process of breaking text into smaller units called tokens
+before feeding it to an LLM. A token is roughly four characters or 0.75 words
+in English.
+
+Context Caching is a feature that allows developers to store a large, repeated
+portion of the input context, such as a system prompt or a long document, on
+the server side. Subsequent requests that reference the cache avoid re-sending
+and re-processing those tokens, reducing latency and cost.
+
+AI Ethics is the study of moral questions related to the development and
+deployment of AI systems, including fairness, accountability, transparency,
+and privacy.
+
+Responsible AI is the practice of designing, developing, and deploying AI
+systems in ways that are safe, fair, transparent, explainable, and aligned
+with human values and societal well-being.
+Introduction to Artificial Intelligence and Machine Learning
+
+Artificial intelligence (AI) is the simulation of human intelligence processes
+by computer systems. These processes include learning, reasoning, and
+self-correction.
+
+Machine Learning (ML) is a subset of AI that allows computers to learn from
+data without being explicitly programmed. Instead of writing rules manually,
+we feed the computer data and let it figure out the rules on its own.
+
+Deep Learning is a further subset of ML that uses neural networks with many
+layers. These deep networks can automatically learn complex representations
+from raw input data like images, text, and audio.
+
+Neural Networks are computing systems vaguely inspired by the biological
+neural networks that constitute animal brains. A neural network consists of
+layers of interconnected nodes or neurons that process information.
+
+Supervised Learning is a type of ML where the model is trained on labeled
+data. The model learns to map input features to known output labels. Examples
+include image classification and spam detection.
+
+Unsupervised Learning is a type of ML where the model is trained on unlabeled
+data and must find structure on its own. Examples include clustering and
+dimensionality reduction.
+
+Reinforcement Learning is a type of ML where an agent learns to make decisions
+by interacting with an environment and receiving rewards or penalties.
+
+Natural Language Processing (NLP) is a branch of AI that helps computers
+understand, interpret, and generate human language. It powers applications
+like chatbots, translation tools, and sentiment analysis.
+
+Computer Vision is a field of AI that enables machines to interpret and make
+decisions based on visual data. Applications include face recognition,
+medical imaging, and autonomous vehicles.
+
+Transformers are a type of deep learning architecture introduced in 2017 that
+revolutionized NLP. The self-attention mechanism allows them to process
+sequences in parallel and capture long-range dependencies.
+
+Large Language Models (LLMs) are neural networks trained on vast amounts of
+text data. They can generate coherent text, answer questions, write code,
+and perform reasoning tasks.
+
+Generative AI refers to AI systems that can create new content, such as text,
+images, audio, and video. Examples include GPT, DALL-E, and Gemini.
+
+Prompt Engineering is the practice of designing effective inputs for AI models
+to get the desired outputs. It is a key skill for working with LLMs.
+
+Transfer Learning is a technique where a model trained on one task is
+fine-tuned for a different but related task. It dramatically reduces training
+time and data requirements.
+
+Embeddings are dense vector representations of data, such as words or
+sentences, in a high-dimensional space. Similar items are close together
+in this space, enabling semantic search and recommendation systems.
+
+Vector Databases are specialized databases designed to store and retrieve
+embeddings efficiently using similarity search algorithms.
+
+Retrieval Augmented Generation (RAG) is an AI technique that combines a
+retrieval system with a generative model. It fetches relevant documents
+from a knowledge base and passes them as context to the LLM, reducing
+hallucinations and grounding responses in real data.
+
+Hallucination is a phenomenon where an AI model generates factually incorrect
+or nonsensical information with confidence. Mitigation strategies include RAG,
+fact-checking, and calibration.
+
+Fine-tuning is the process of further training a pre-trained model on a
+smaller, task-specific dataset. It adapts the model to specialized domains
+like medical diagnosis or legal text analysis.
+
+Model Evaluation is the process of assessing a model performance using
+metrics such as accuracy, precision, recall, F1 score, and perplexity.
+
+Bias in AI refers to systematic errors in model outputs that arise from
+biased training data or flawed model design. It can lead to unfair or
+discriminatory outcomes.
+
+Explainable AI (XAI) is the set of techniques that make AI model decisions
+interpretable and transparent to humans, which is critical for high-stakes
+applications like healthcare and finance.
+
+Edge AI refers to running AI models locally on end-user devices rather than
+in the cloud, enabling real-time inference with lower latency and improved
+privacy.
+
+Multimodal AI refers to AI systems that can process and generate multiple
+types of data, such as text, images, audio, and video, simultaneously.
+
+Agents in AI are autonomous systems that perceive their environment, make
+decisions, and take actions to achieve a goal. They can use tools, browse
+the web, write code, and collaborate with other agents.
+
+Function Calling is a feature that allows LLMs to invoke external tools or
+APIs. The model generates a structured call, the tool executes it, and the
+result is fed back to the model for a final answer.
+
+Context Window is the maximum number of tokens an LLM can process at once,
+including both input and output. Gemini models support context windows up to
+one million tokens.
+
+Tokenization is the process of breaking text into smaller units called tokens
+before feeding it to an LLM. A token is roughly four characters or 0.75 words
+in English.
+
+Context Caching is a feature that allows developers to store a large, repeated
+portion of the input context, such as a system prompt or a long document, on
+the server side. Subsequent requests that reference the cache avoid re-sending
+and re-processing those tokens, reducing latency and cost.
+
+AI Ethics is the study of moral questions related to the development and
+deployment of AI systems, including fairness, accountability, transparency,
+and privacy.
+
+Responsible AI is the practice of designing, developing, and deploying AI
+systems in ways that are safe, fair, transparent, explainable, and aligned
+with human values and societal well-being.
+Introduction to Artificial Intelligence and Machine Learning
+
+Artificial intelligence (AI) is the simulation of human intelligence processes
+by computer systems. These processes include learning, reasoning, and
+self-correction.
+
+Machine Learning (ML) is a subset of AI that allows computers to learn from
+data without being explicitly programmed. Instead of writing rules manually,
+we feed the computer data and let it figure out the rules on its own.
+
+Deep Learning is a further subset of ML that uses neural networks with many
+layers. These deep networks can automatically learn complex representations
+from raw input data like images, text, and audio.
+
+Neural Networks are computing systems vaguely inspired by the biological
+neural networks that constitute animal brains. A neural network consists of
+layers of interconnected nodes or neurons that process information.
+
+Supervised Learning is a type of ML where the model is trained on labeled
+data. The model learns to map input features to known output labels. Examples
+include image classification and spam detection.
+
+Unsupervised Learning is a type of ML where the model is trained on unlabeled
+data and must find structure on its own. Examples include clustering and
+dimensionality reduction.
+
+Reinforcement Learning is a type of ML where an agent learns to make decisions
+by interacting with an environment and receiving rewards or penalties.
+
+Natural Language Processing (NLP) is a branch of AI that helps computers
+understand, interpret, and generate human language. It powers applications
+like chatbots, translation tools, and sentiment analysis.
+
+Computer Vision is a field of AI that enables machines to interpret and make
+decisions based on visual data. Applications include face recognition,
+medical imaging, and autonomous vehicles.
+
+Transformers are a type of deep learning architecture introduced in 2017 that
+revolutionized NLP. The self-attention mechanism allows them to process
+sequences in parallel and capture long-range dependencies.
+
+Large Language Models (LLMs) are neural networks trained on vast amounts of
+text data. They can generate coherent text, answer questions, write code,
+and perform reasoning tasks.
+
+Generative AI refers to AI systems that can create new content, such as text,
+images, audio, and video. Examples include GPT, DALL-E, and Gemini.
+
+Prompt Engineering is the practice of designing effective inputs for AI models
+to get the desired outputs. It is a key skill for working with LLMs.
+
+Transfer Learning is a technique where a model trained on one task is
+fine-tuned for a different but related task. It dramatically reduces training
+time and data requirements.
+
+Embeddings are dense vector representations of data, such as words or
+sentences, in a high-dimensional space. Similar items are close together
+in this space, enabling semantic search and recommendation systems.
+
+Vector Databases are specialized databases designed to store and retrieve
+embeddings efficiently using similarity search algorithms.
+
+Retrieval Augmented Generation (RAG) is an AI technique that combines a
+retrieval system with a generative model. It fetches relevant documents
+from a knowledge base and passes them as context to the LLM, reducing
+hallucinations and grounding responses in real data.
+
+Hallucination is a phenomenon where an AI model generates factually incorrect
+or nonsensical information with confidence. Mitigation strategies include RAG,
+fact-checking, and calibration.
+
+Fine-tuning is the process of further training a pre-trained model on a
+smaller, task-specific dataset. It adapts the model to specialized domains
+like medical diagnosis or legal text analysis.
+
+Model Evaluation is the process of assessing a model performance using
+metrics such as accuracy, precision, recall, F1 score, and perplexity.
+
+Bias in AI refers to systematic errors in model outputs that arise from
+biased training data or flawed model design. It can lead to unfair or
+discriminatory outcomes.
+
+Explainable AI (XAI) is the set of techniques that make AI model decisions
+interpretable and transparent to humans, which is critical for high-stakes
+applications like healthcare and finance.
+
+Edge AI refers to running AI models locally on end-user devices rather than
+in the cloud, enabling real-time inference with lower latency and improved
+privacy.
+
+Multimodal AI refers to AI systems that can process and generate multiple
+types of data, such as text, images, audio, and video, simultaneously.
+
+Agents in AI are autonomous systems that perceive their environment, make
+decisions, and take actions to achieve a goal. They can use tools, browse
+the web, write code, and collaborate with other agents.
+
+Function Calling is a feature that allows LLMs to invoke external tools or
+APIs. The model generates a structured call, the tool executes it, and the
+result is fed back to the model for a final answer.
+
+Context Window is the maximum number of tokens an LLM can process at once,
+including both input and output. Gemini models support context windows up to
+one million tokens.
+
+Tokenization is the process of breaking text into smaller units called tokens
+before feeding it to an LLM. A token is roughly four characters or 0.75 words
+in English.
+
+Context Caching is a feature that allows developers to store a large, repeated
+portion of the input context, such as a system prompt or a long document, on
+the server side. Subsequent requests that reference the cache avoid re-sending
+and re-processing those tokens, reducing latency and cost.
+
+AI Ethics is the study of moral questions related to the development and
+deployment of AI systems, including fairness, accountability, transparency,
+and privacy.
+
+Responsible AI is the practice of designing, developing, and deploying AI
+systems in ways that are safe, fair, transparent, explainable, and aligned
+with human values and societal well-being.

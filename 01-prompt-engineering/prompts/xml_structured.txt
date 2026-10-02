@@ -1,0 +1,18 @@
+<task>
+  Explain what a Large Language Model is and how it works.
+</task>
+
+<audience>
+  Third-year engineering students who know Python but have never studied NLP or deep learning.
+</audience>
+
+<constraints>
+  - Use an analogy to make the concept intuitive.
+  - Maximum 4 sentences.
+  - Avoid mathematical notation.
+  - Do not use the word "essentially".
+</constraints>
+
+<output_format>
+  Plain paragraph. No bullet points. No headings.
+</output_format>

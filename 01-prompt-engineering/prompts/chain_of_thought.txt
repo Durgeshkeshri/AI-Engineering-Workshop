@@ -1,0 +1,9 @@
+What is a Large Language Model and how does it work?
+
+Think step by step before answering.
+
+Step 1: What is the input — what does the model receive?
+Step 2: How does the model process that input internally?
+Step 3: What does the model actually predict at each step?
+Step 4: How does the final response get built from those predictions?
+Answer:

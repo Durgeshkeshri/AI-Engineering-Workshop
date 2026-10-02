@@ -1,0 +1,11 @@
+# Core
+google-genai
+python-dotenv
+
+# Project 1 — ChatBot Agent
+fastapi
+uvicorn[standard]
+pydantic
+
+# Project 2 — RAG Pipeline
+chromadb
