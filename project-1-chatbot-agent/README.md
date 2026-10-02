@@ -34,8 +34,8 @@ project-1-chatbot-agent/
 ├── backend/
 │   ├── main.py          # FastAPI application entrypoint (CORS, router inclusion, SPA serving)
 │   ├── routes/
-│   │   └── chat.py      # Chat & health API routes (POST /chat, DELETE /chat/clear, GET /health)
-│   ├── memory.py        # In-memory session store (get_history, clear_session)
+│   │   └── chat.py      # Chat & health API routes (POST /chat, GET /health)
+│   ├── memory.py        # In-memory session store (get_history)
 │   ├── model/
 │   │   └── model.py     # Pydantic request & response data models (ChatRequest, ChatResponse)
 │   ├── config/
@@ -52,7 +52,7 @@ project-1-chatbot-agent/
 │       └── faq.json     # Bharati Vidyapeeth policy & department FAQ database
 └── frontend/
     ├── index.html       # SPA chat interface
-    ├── style.css        # Premium dark-mode stylesheet
+    ├── style.css        # Light, neutral stylesheet
     └── app.js           # Chat logic, markdown rendering, tool badges
 ```
 
@@ -114,7 +114,6 @@ The FastAPI server automatically serves the frontend — no separate web server 
 | Method     | Endpoint                       | Description                                                                                   |
 | ---------- | ------------------------------ | --------------------------------------------------------------------------------------------- |
 | `POST`   | `/chat`                      | Send a message. Body:`{"message": "...", "session_id": "..."}`. Returns reply + tools_used. |
-| `DELETE` | `/chat/clear?session_id=...` | Clear conversation history for a session.                                                     |
 | `GET`    | `/health`                    | Health check. Returns`{"status": "ok"}`.                                                    |
 | `GET`    | `/`                          | Serves the browser UI.                                                                        |
 
@@ -125,7 +124,7 @@ The FastAPI server automatically serves the frontend — no separate web server 
 | Tool                     | Description                                                   |
 | ------------------------ | ------------------------------------------------------------- |
 | `get_current_datetime` | Returns current date & time in IST                            |
-| `calculate`            | Evaluates arithmetic expressions                              |
+| `calculate`            | Evaluates arithmetic expressions (parsed safely, no `eval`)   |
 | `search_faq`           | Searches the Bharati Vidyapeeth FAQ knowledge base            |
 | `google_search`        | Native Gemini Google Search grounding (real-time web results) |
 
@@ -134,4 +133,8 @@ The FastAPI server automatically serves the frontend — no separate web server 
 ## 📝 Notes
 
 - **Session management** is in-memory and resets on server restart.
+- **Grounding:** College-specific facts must come from `search_faq` or web search, not from the model's memory. The prompt (`backend/prompts/system_prompt.txt`) tells the model to say where facts came from, not to infer, and to point users to the administration when sources don't answer.
+- **`calculate`** parses the expression with Python's `ast` module and allows only numbers and `+ - * / // % **`, so model-generated text is never run as code.
+- **`search_faq`** is a simple keyword match that returns the first FAQ entry sharing a word with the query. It is fine for a small demo FAQ but can match unrelated entries on common words.
+- **New chat:** The **New chat** button asks for confirmation (the old conversation is lost), clears the screen, and drops the session ID, so the next message starts a fresh session. The previous session's history stays in server memory until the server restarts.
 - The **Google Search** grounding uses Gemini's built-in capability — no Search API key required.
