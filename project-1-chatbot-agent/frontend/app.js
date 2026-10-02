@@ -7,11 +7,11 @@ let isLoading  = false;
 const chatWindow     = document.getElementById("chat-window");
 const queryInput     = document.getElementById("query-input");
 const sendBtn        = document.getElementById("btn-send");
-const clearBtn       = document.getElementById("clearBtn");
 const welcomeCard    = document.getElementById("welcomeCard");
 const sidebar        = document.getElementById("sidebar");
 const toggleBtn      = document.getElementById("sidebarToggleBtn");
 const typingEl       = document.getElementById("typingIndicator");
+const chatTitle      = document.querySelector(".chat-title");
 
 /* ─── Sidebar toggle (toggle button always lives in the header) ──────────── */
 toggleBtn.addEventListener("click", () => {
@@ -35,7 +35,7 @@ function renderMarkdown(text) {
     .replace(/^[\-\*] (.+)$/gm, "<li>$1</li>")
     .replace(/((<li>.*<\/li>\n?)+)/g, "<ul>$1</ul>")
     .replace(/^\d+\. (.+)$/gm, "<li>$1</li>")
-    .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener">$1</a>');
+    .replace(/\[([^\]]+)\]\((https?:\/\/[^)\s]+)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>');
 
   return html.split(/\n{2,}/).map(block => {
     block = block.trim();
@@ -43,6 +43,12 @@ function renderMarkdown(text) {
     if (/^<(h[1-6]|ul|ol|pre|hr)/.test(block)) return block;
     return `<p>${block.replace(/\n/g, "<br>")}</p>`;
   }).join("\n");
+}
+
+function escapeHtml(str) {
+  return String(str ?? "").replace(/[&<>"']/g, c => (
+    { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]
+  ));
 }
 
 /* ─── Tool badge helper ──────────────────────────────────────────────────── */
@@ -56,8 +62,8 @@ const TOOL_META = {
 function buildToolBadges(tools) {
   if (!tools || tools.length === 0) return "";
   const inner = tools.map(t => {
-    const m = TOOL_META[t] || { label: t, cls: "faq" };
-    return `<span class="tool-badge ${m.cls}">${m.label}</span>`;
+    const m = TOOL_META[t] || { label: escapeHtml(t) };
+    return `<span class="tool-badge">${m.label}</span>`;
   }).join("");
   return `<div class="tool-badges">${inner}</div>`;
 }
@@ -71,18 +77,18 @@ function buildCitations(citations) {
       catch (_) { return c.uri; }
     })();
     return `
-      <a class="citation-card" href="${c.uri}" target="_blank" rel="noopener noreferrer">
+      <a class="citation-card" href="${escapeHtml(c.uri)}" target="_blank" rel="noopener noreferrer">
         <span class="citation-num">${i + 1}</span>
         <span class="citation-text">
-          <span class="citation-title">${c.title}</span>
-          <span class="citation-host">${host}</span>
+          <span class="citation-title">${escapeHtml(c.title || host)}</span>
+          <span class="citation-host">${escapeHtml(host)}</span>
         </span>
         <svg class="citation-arrow" width="12" height="12" viewBox="0 0 12 12" fill="none">
           <path d="M2 10L10 2M10 2H4M10 2V8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
       </a>`;
   }).join("");
-  return `<div class="citations"><div class="citations-label">🌐 Sources</div>${items}</div>`;
+  return `<div class="citations"><div class="citations-label">Sources</div>${items}</div>`;
 }
 
 /* ─── Append messages ────────────────────────────────────────────────────── */
@@ -90,20 +96,16 @@ function clearWelcome() {
   if (welcomeCard) welcomeCard.style.display = "none";
 }
 
-function appendMessage(role, text, tools = [], citations = []) {
+function appendMessage(role, text, tools = [], citations = [], isError = false) {
   clearWelcome();
 
   const msg    = document.createElement("div");
-  msg.className = `msg ${role}`;
-
-  const avatar = document.createElement("div");
-  avatar.className = "avatar";
-  avatar.textContent = role === "user" ? "👤" : "🤖";
+  msg.className = `msg ${role}${isError ? " error" : ""}`;
 
   const bubble = document.createElement("div");
   bubble.className = "bubble";
 
-  if (role === "bot") {
+  if (role === "bot" && !isError) {
     bubble.innerHTML =
       renderMarkdown(text) +
       buildToolBadges(tools) +
@@ -112,7 +114,6 @@ function appendMessage(role, text, tools = [], citations = []) {
     bubble.textContent = text;
   }
 
-  msg.appendChild(avatar);
   msg.appendChild(bubble);
   chatWindow.appendChild(msg);
   chatWindow.scrollTop = chatWindow.scrollHeight;
@@ -134,9 +135,14 @@ async function sendMessage() {
 
   isLoading = true;
   sendBtn.disabled = true;
+  newChatBtn.disabled = true;
   queryInput.value = "";
   autoResize();
 
+  if (!chatTitle.dataset.set) {
+    chatTitle.textContent = text.length > 60 ? text.slice(0, 57) + "…" : text;
+    chatTitle.dataset.set = "1";
+  }
   appendMessage("user", text);
   showTyping();
 
@@ -159,16 +165,17 @@ async function sendMessage() {
     appendMessage("bot", data.reply, data.tools_used || [], data.citations || []);
   } catch (err) {
     hideTyping();
-    appendMessage("bot", `⚠️ Error: ${err.message}`, []);
+    appendMessage("bot", `Something went wrong: ${err.message}`, [], [], true);
   } finally {
     isLoading = false;
     sendBtn.disabled = false;
+    newChatBtn.disabled = false;
     queryInput.focus();
   }
 }
 
-/* ─── Clear chat ─────────────────────────────────────────────────────────── */
-async function clearChat() {
+/* ─── New chat ───────────────────────────────────────────────────────────── */
+async function startNewChat() {
   if (sessionId) {
     try {
       await fetch(`${API_BASE}/chat/clear?session_id=${sessionId}`, { method: "DELETE" });
@@ -178,7 +185,12 @@ async function clearChat() {
   Array.from(chatWindow.children).forEach(el => {
     if (el.id !== "welcomeCard") el.remove();
   });
-  if (welcomeCard) welcomeCard.style.display = "";
+  welcomeCard.style.display = "";
+  chatTitle.textContent = "New conversation";
+  delete chatTitle.dataset.set;
+  queryInput.value = "";
+  autoResize();
+  queryInput.focus();
 }
 
 /* ─── Auto-resize textarea ───────────────────────────────────────────────── */
@@ -199,7 +211,27 @@ queryInput.addEventListener("keydown", e => {
 
 queryInput.addEventListener("input", autoResize);
 
-clearBtn.addEventListener("click", clearChat);
+/* ─── New chat dialog ───────────────────────────────────────────────────── */
+// ── New chat (with confirmation) ─────────────────────────────────────────────
+const newChatBtn   = document.getElementById("newChatBtn");
+const confirmModal = document.getElementById("confirmModal");
+const confirmOk    = document.getElementById("confirmOk");
+const confirmCancel = document.getElementById("confirmCancel");
+
+function openConfirm()  { confirmModal.hidden = false; confirmOk.focus(); }
+function closeConfirm() { confirmModal.hidden = true; newChatBtn.focus(); }
+
+newChatBtn.addEventListener("click", () => {
+  // Nothing to lose if no messages have been sent yet
+  if (document.querySelector(".msg")) openConfirm();
+});
+confirmCancel.addEventListener("click", closeConfirm);
+confirmModal.addEventListener("click", e => { if (e.target === confirmModal) closeConfirm(); });
+document.addEventListener("keydown", e => { if (e.key === "Escape" && !confirmModal.hidden) closeConfirm(); });
+confirmOk.addEventListener("click", async () => {
+  closeConfirm();
+  await startNewChat();
+});
 
 // Sample queries load into textbox (never auto-send)
 document.querySelectorAll(".suggestion-chip").forEach(btn => {
