@@ -72,7 +72,7 @@ Create a `.env` file in the repository root directory (`Workshop/.env`):
 
 ```env
 GEMINI_API_KEY=your_actual_api_key_here
-GEMINI_MODEL=gemini-2.5-flash
+GEMINI_MODEL=gemini-3.8-flash
 EMBEDDING_MODEL=text-embedding-004
 ```
 
