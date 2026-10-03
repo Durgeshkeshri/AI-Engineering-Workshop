@@ -32,7 +32,7 @@ python 06-token-usage/main.py
 - **Text only:** only `Input (TEXT)` is shown — cheapest call
 - **Image + Text:** `Input (IMAGE)` adds ~1 100 tokens for a small JPEG — images are expensive
 - **Audio + Text:** `Input (AUDIO)` adds ~15 000 tokens for a few minutes of audio — very token-heavy
-- **Thoughts:** Gemini 2.5 Flash uses internal reasoning tokens (`thoughts_token_count`) not visible in the response text but counted toward total cost
+- **Thoughts:** Gemini 3.8 Flash uses internal reasoning tokens (`thoughts_token_count`) not visible in the response text but counted toward total cost
 - **Cached:** The audio call may show `Cached Input` tokens — these are billed at a reduced rate
 
 ## Challenge
